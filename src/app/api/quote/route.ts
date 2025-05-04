@@ -12,8 +12,8 @@ export async function GET() {
   try {
     // Fetch data from the external API (zenquotes.io)
     const response = await fetch(EXTERNAL_QUOTE_API_URL, {
-      // Optional: Set a timeout for the request
-      signal: AbortSignal.timeout(5000), // 5 seconds timeout
+      // Increased the timeout duration to 10 seconds
+      signal: AbortSignal.timeout(10000), // 10 seconds timeout
 
       // Disable caching for this fetch request to always get a new quote
       cache: 'no-store'
