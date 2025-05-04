@@ -1,32 +1,63 @@
 // src/app/api/quote/route.ts
+
 import { NextResponse } from 'next/server';
 
-// Our "Free GenAI" - a simple list of quotes
-const quotes = [
-    "The mind is everything. What you think you become. - Buddha",
-    "The best way to predict the future is to create it. - Peter Drucker",
-    "Simplicity is the ultimate sophistication. - Leonardo da Vinci",
-    "Everything you can imagine is real. - Pablo Picasso",
-    "Do one thing every day that scares you. - Eleanor Roosevelt",
-    "Strive not to be a success, but rather to be of value. - Albert Einstein",
-    "The only way to do great work is to love what you do. - Steve Jobs",
-    "Very little is needed to make a happy life; it is all within yourself, in your way of thinking. - Marcus Aurelius",
-    "Be the change that you wish to see in the world. - Mahatma Gandhi",
-    "Live as if you were to die tomorrow. Learn as if you were to live forever. - Mahatma Gandhi"
-];
+// Define the external API URL for zenquotes.io
+const EXTERNAL_QUOTE_API_URL = 'https://zenquotes.io/api/random';
+
+// Fallback quote in case the external API fails
+const FALLBACK_QUOTE = "The journey of a thousand miles begins with a single step. - Lao Tzu";
 
 export async function GET() {
-    // Select a random quote
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[randomIndex];
+  try {
+    // Fetch data from the external API (zenquotes.io)
+    const response = await fetch(EXTERNAL_QUOTE_API_URL, {
+      // Optional: Set a timeout for the request
+      signal: AbortSignal.timeout(5000), // 5 seconds timeout
 
-    // Return the quote as JSON
-    // Add a small delay to simulate network latency (optional)
-    await new Promise(resolve => setTimeout(resolve, 200)); 
+      // Disable caching for this fetch request to always get a new quote
+      cache: 'no-store'
+    });
 
-    return NextResponse.json({ quote });
+    // Check if the external API request was successful
+    if (!response.ok) {
+      console.error(`Error fetching quote from zenquotes.io: ${response.status} ${response.statusText}`);
+      // Throw an error to be caught by the catch block
+      throw new Error('Failed to fetch quote from external API');
+    }
+
+    // Parse the JSON response
+    // zenquotes.io returns an array like [{"q":"Quote text","a":"Author Name"}]
+    const data = await response.json();
+
+    // Check if the response data is in the expected format and contains a quote
+    if (!Array.isArray(data) || data.length === 0 || !data[0].q || !data[0].a) {
+      console.error('External API response from zenquotes.io missing expected data');
+      throw new Error('Invalid data received from external API');
+    }
+
+    // Extract the quote and author from the first object in the array
+    const quoteContent = data[0].q;
+    const quoteAuthor = data[0].a;
+
+    // Format the quote string (content - author)
+    const formattedQuote = `${quoteContent} - ${quoteAuthor}`;
+
+    // Return the formatted quote to our frontend
+    return NextResponse.json({ quote: formattedQuote });
+
+  } catch (error) {
+    console.error('Error in /api/quote:', error);
+
+    // Return a fallback quote in case of any error
+    return NextResponse.json({ quote: FALLBACK_QUOTE }, {
+      status: 500, // Internal Server Error status code
+      headers: {
+        'Cache-Control': 'no-store', // Don't cache error responses
+      },
+    });
+  }
 }
 
-// Optional: Add configuration for edge runtime if preferred, 
-// but default Node.js runtime is fine for this.
-// export const runtime = 'edge';
+// Force dynamic execution (prevents caching of the API route itself)
+export const dynamic = 'force-dynamic';
