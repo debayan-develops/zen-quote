@@ -1,26 +1,69 @@
-@import "tailwindcss";
+/* src/app/globals.css */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+  These directives are essential for Tailwind CSS to inject its base styles,
+  components, and utility classes into your CSS.
+  DO NOT REMOVE THESE LINES.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/*
+  Optional: Add any global styles below.
+  The document suggests adding styles for smoother font rendering.
+  Tailwind classes on components and the main page will handle most other styling
+  like background colors, text colors, and fonts based on your theme and utility usage.
+*/
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /*
+    These properties help make text look smoother on different operating systems.
+  */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /*
+    Setting a default font here can be a fallback, but Tailwind's utility classes
+    (like font-sans, font-serif, font-mono) are the preferred way to manage fonts
+    within your components for consistency with the design system.
+    The Next.js default setup might also configure fonts in layout.tsx or similar.
+    Keeping it simple here aligns with the document's minimalist approach.
+  */
+  /* font-family: sans-serif; */ /* Example: You could add a fallback like this */
 }
+
+/*
+  Remove or comment out any other styles here that are not needed,
+  especially default styles that might interfere with Tailwind's utilities.
+  The original content you showed with `:root`, `@theme inline`,
+  and specific background/color/font-family on `body` using CSS variables
+  can be removed as Tailwind will manage these via utility classes.
+*/
+
+/*
+  Example of removing original content:
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+    }
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif; // This is handled by Tailwind classes
+  }
+*/
