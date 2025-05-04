@@ -48,9 +48,11 @@ export default function QuoteCard() {
         }
       }
 
-    } catch (err: any) { // Use 'any' for simpler error handling or define a more specific type
+    } catch (err: unknown) { // FIX: Changed 'any' to 'unknown' to satisfy TypeScript/ESLint rules
       console.error("Frontend fetch error:", err);
       // Display a generic error message if something unexpected goes wrong
+      // We can't directly access err.message here without a type check,
+      // but we are setting a static error message anyway.
       setError('An error occurred while fetching the quote. Please try again.');
       setQuote(""); // Clear the quote on a hard error
     } finally {
